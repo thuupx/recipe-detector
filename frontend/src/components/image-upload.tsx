@@ -37,7 +37,7 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
   });
 
   const thumbs = files.map((file) => (
-    <div key={file.name} >
+    <div key={file.name}>
       <Image src={file.preview} alt={file.name} width={256} height={256} />
     </div>
   ));
@@ -50,33 +50,32 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
   }, [files, setSettings]);
 
   return (
-    <section>
-      <Card>
-        <CardHeader
-          {...getRootProps({ className: "dropzone" })}
-          className="flex flex-col items-center space-y-1.5 hover:cursor-pointer"
-        >
-          <Upload size={64} />
-          <Input {...getInputProps()} />
-          <p className="text-xl ">
-            Drag and drop image here, or click to select an image
-          </p>
-          <aside className="flex flex-wrap gap-2">{thumbs}</aside>
-        </CardHeader>
-        <CardFooter>
-          {files.length > 0 && (
-            <Button
-              className="m-auto"
-              onClick={async () => {
-                const settings = await predictRecipe(files[0]);
-                setSettings(settings);
-              }}
-            >
-              Predict
-            </Button>
-          )}
-        </CardFooter>
-      </Card>
-    </section>
+    <Card className="m-4">
+      <CardHeader
+        {...getRootProps({
+          className: "flex flex-col items-center hover:cursor-pointer",
+        })}
+      >
+        <Upload size={64} />
+        <Input {...getInputProps()} />
+        <p className="text-xl">
+          Drag and drop image here, or click to select an image
+        </p>
+        <aside className="flex flex-wrap gap-2">{thumbs}</aside>
+      </CardHeader>
+      <CardFooter>
+        {files.length > 0 && (
+          <Button
+            className="m-auto"
+            onClick={async () => {
+              const settings = await predictRecipe(files[0]);
+              setSettings(settings);
+            }}
+          >
+            Predict
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
 }

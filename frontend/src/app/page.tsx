@@ -9,8 +9,8 @@ export default function Home() {
   const [settings, setSettings] = useState<RecipeSettingsResponse | null>(null);
 
   return (
-    <div className="container mx-auto w-full">
-      <h1 className="text-3xl font-bold md:text-5xl pb-4">
+    <div className="container mx-auto">
+      <h1 className="text-3xl text-center font-bold md:text-5xl py-8">
         Fujifilm Recipe Detector
       </h1>
       <div className="flex flex-col items-start md:flex-row justify-center gap-4 w-full">
