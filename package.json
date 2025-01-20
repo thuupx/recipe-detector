@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "server": "FLASK_DEBUG=1 pip3 install -r requirements.txt && python3 -m flask --app server run --debug -p 5328",
-    "dev": "next dev --turbopack",
+    "server": "FLASK_DEBUG=1 pip3 install -r requirements.txt && python3 -m flask --app src/api/index run --debug -p 5328",
+    "dev": "concurrently \"next dev --turbopack\" \"npm run server\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -29,10 +29,12 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.1.2",
     "eslint": "^9",
     "eslint-config-next": "15.1.5",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "npm@10.9.0"
 }
