@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from flask import Flask
 
@@ -15,7 +16,6 @@ def create_app(test_config=None):
         DATABASE=os.path.join(app.instance_path, "flaskr.sqlite"),
     )
 
-
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile("config.py", silent=True)
@@ -29,14 +29,22 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    @app.route("/predict")
+    @app.post("/predict")
     def predict():
-        sample_img = os.path.abspath("sample.jpg")
+        from flask import request
 
-        result = detector.predict(sample_img)
-        
+        image = request.files["image"].read()
+
+        image_path = uuid.uuid4().hex + ".jpg"
+
+        with open(image_path, "wb") as f:
+            f.write(image)
+
+        result = detector.predict(image_path)
+
+        os.remove(image_path)
+
         print(result)
-        
         return result
 
     return app
