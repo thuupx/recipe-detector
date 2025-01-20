@@ -29,7 +29,6 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
     @app.route("/predict")
     def predict():
         sample_img = os.path.abspath("sample.jpg")

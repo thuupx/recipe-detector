@@ -8,13 +8,36 @@ from app.constants import numeric_fields, mappings, films_by_sensor
 
 SENSOR_FILM_SIMULATIONS = films_by_sensor
 MODEL_PATH = os.path.abspath("film_model.keras")
+SERVICE_ACCOUNT_PATH = os.path.abspath("service-account.json")
 
 
 class FujifilmRecipeDetector:
     def __init__(self):
         """Initialize the detector with model and mappings."""
+        self.download_model_if_not_exist()
         self.model = tf.keras.models.load_model(MODEL_PATH, compile=False)
+
         self.mappings = mappings
+
+
+    def download_model_if_not_exist(self):
+        """Download model from Firebase Storage if it does not exist."""
+        if not os.path.exists(MODEL_PATH):
+            import firebase_admin
+            from firebase_admin import credentials, storage
+
+            cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+            firebase_admin.initialize_app(
+                cred, {"storageBucket": "vortex-ai-13f4.firebasestorage.app"}
+            )
+
+            bucket = storage.bucket()
+            blob = bucket.blob("vortex-models/film_model.keras")
+
+            print("Downloading model...")
+
+            blob.download_to_filename(MODEL_PATH)
+            print("Downloaded")
 
     def _denormalize_numeric(self, field, value):
         """Denormalize numeric values from model output."""
