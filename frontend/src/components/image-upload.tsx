@@ -50,7 +50,7 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
   }, [files, setSettings]);
 
   return (
-    <Card className="m-4">
+    <Card className="mx-4">
       <CardHeader
         {...getRootProps({
           className: "flex flex-col items-center hover:cursor-pointer",
