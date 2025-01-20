@@ -10,6 +10,7 @@ import { RecipeSettingsResponse } from "@/types";
 import { Button } from "./ui/button";
 import { Card, CardFooter, CardHeader } from "./ui/card";
 import { Input } from "./ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 type AcceptedFile = File & { preview: string };
 
@@ -19,6 +20,7 @@ type ImageUploadProps = {
 
 export function ImageUpload({ setSettings }: ImageUploadProps) {
   const [files, setFiles] = useState<AcceptedFile[]>([]);
+  const { toast } = useToast();
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -68,8 +70,16 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
           <Button
             className="m-auto"
             onClick={async () => {
-              const settings = await predictRecipe(files[0]);
-              setSettings(settings);
+              try {
+                const settings = await predictRecipe(files[0]);
+                setSettings(settings);
+              } catch (error) {
+                toast({
+                  title: "Error",
+                  description: "Failed to predict recipe",
+                  variant: "destructive",
+                });
+              }
             }}
           >
             Predict
