@@ -1,11 +1,10 @@
-import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/toaster";
-import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 
-import "./globals.css";
-import Head from "next/head";
 import Script from "next/script";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,13 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Head>
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1678493032772527"
-          crossOrigin="anonymous"
-        ></Script>
-      </Head>
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1678493032772527"
+        crossOrigin="anonymous"
+      ></Script>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
