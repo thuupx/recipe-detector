@@ -74,6 +74,7 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
                 const settings = await predictRecipe(files[0]);
                 setSettings(settings);
               } catch (error) {
+                console.error(error);
                 toast({
                   title: "Error",
                   description: "Failed to predict recipe",
