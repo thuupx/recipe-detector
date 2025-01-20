@@ -1,0 +1,2 @@
+firebase-admin==6.6.0
+Flask==3.0.3

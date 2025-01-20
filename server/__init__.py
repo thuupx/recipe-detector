@@ -3,7 +3,7 @@ import uuid
 
 from flask import Flask
 
-from app.detector import FujifilmRecipeDetector
+from server.detector import FujifilmRecipeDetector
 
 detector = FujifilmRecipeDetector()
 

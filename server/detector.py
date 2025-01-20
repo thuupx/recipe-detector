@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 import os
 
-from app.logger import logger
-from app.constants import numeric_fields, mappings, films_by_sensor
+from server.logger import logger
+from server.constants import numeric_fields, mappings, films_by_sensor
 
 
 SENSOR_FILM_SIMULATIONS = films_by_sensor
