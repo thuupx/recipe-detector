@@ -25,9 +25,7 @@ export default function Home() {
             target="_blank"
             href="https://github.com/thuupx/recipe-detector"
           >
-            <span>
-              Send a star on <Github size={16} className="inline-block" />
-            </span>
+            <Github size={24} />
           </Link>
           Built with{" "}
           <span className="font-semibold">
