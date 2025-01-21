@@ -7,7 +7,7 @@ export async function predictRecipe(imageFile: File) {
   formData.append("image", imageFile);
   const data = formData;
 
-  const res = await fetch(`http://localhost:3000/api/predict`, {
+  const res = await fetch(`${process.env.API_URL}/api/predict`, {
     method: "POST",
     body: data,
   });
