@@ -14,19 +14,20 @@ export default function Home() {
       <h1 className="text-3xl text-center font-bold md:text-5xl py-8">
         Fujifilm Recipe Detector using AI
       </h1>
+
+      <Link
+        className="absolute top-8 right-8"
+        target="_blank"
+        href="https://github.com/thuupx/recipe-detector"
+      >
+        <Github size={32} />
+      </Link>
       <div className="flex flex-col items-start md:flex-row justify-center gap-4 w-full">
         <ImageUpload setSettings={setSettings} />
         <RecipeSettings settings={settings} />
       </div>
       <footer className="container flex flex-col items-center justify-center gap-4 py-16">
         <p className="text-sm text-muted-foreground text-center">
-          <Link
-            className="flex items-center gap-1"
-            target="_blank"
-            href="https://github.com/thuupx/recipe-detector"
-          >
-            <Github size={24} />
-          </Link>
           Built with{" "}
           <span className="font-semibold">
             <Heart size={16} className="inline-block" />
