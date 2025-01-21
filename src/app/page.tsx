@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl text-center font-bold md:text-5xl py-8">
-        Fujifilm Recipe Detector
+        Fujifilm Recipe Detector using AI
       </h1>
       <div className="flex flex-col items-start md:flex-row justify-center gap-4 w-full">
         <ImageUpload setSettings={setSettings} />
@@ -26,10 +26,7 @@ export default function Home() {
           </span>{" "}
           by{" "}
           <span className="font-semibold">
-            <Link
-              target="_blank"
-              href="https://www.linkedin.com/in/thu-px"
-            >
+            <Link target="_blank" href="https://www.linkedin.com/in/thu-px">
               PXT
             </Link>
           </span>

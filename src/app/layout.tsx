@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Recipe Detector - powered by AI",
+  title: "Fujifilm Recipe Detector - powered by AI",
   description: "Reverse engineer a Fujifilm custom recipe using AI",
 };
 

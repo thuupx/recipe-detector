@@ -13,6 +13,7 @@ import { RecipeSettingsResponse } from "@/types";
 import { Button } from "./ui/button";
 import { Card, CardFooter, CardHeader } from "./ui/card";
 import { Input } from "./ui/input";
+import { LoadingSpinner } from "./loading";
 
 type AcceptedFile = File & { preview: string };
 
@@ -22,6 +23,7 @@ type ImageUploadProps = {
 
 export function ImageUpload({ setSettings }: ImageUploadProps) {
   const [file, setFile] = useState<AcceptedFile>();
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -84,6 +86,7 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
             className="m-auto"
             onClick={async () => {
               try {
+                setIsLoading(true);
                 const settings = await predictRecipe(file);
                 setSettings(settings);
               } catch (error) {
@@ -93,10 +96,12 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
                   description: "Failed to predict recipe",
                   variant: "destructive",
                 });
+              } finally {
+                setIsLoading(false);
               }
             }}
           >
-            Predict
+            {isLoading ? <LoadingSpinner size={24} /> : "Predict"}
           </Button>
         )}
       </CardFooter>
