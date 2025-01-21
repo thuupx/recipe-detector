@@ -3,6 +3,7 @@ import { ImageUpload } from "@/components/image-upload";
 import { RecipeSettings } from "@/components/recipe-settings";
 import { RecipeSettingsResponse } from "@/types";
 import { Heart } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Home() {
@@ -23,7 +24,15 @@ export default function Home() {
           <span className="font-semibold">
             <Heart size={16} className="inline-block" />
           </span>{" "}
-          by <span className="font-semibold">PXT</span>
+          by{" "}
+          <span className="font-semibold">
+            <Link
+              target="_blank"
+              href="https://www.linkedin.com/in/thu-px"
+            >
+              PXT
+            </Link>
+          </span>
         </p>
       </footer>
     </div>

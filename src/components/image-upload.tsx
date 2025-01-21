@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
 import { predictRecipe } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
+import { compressImage } from "@/lib/image";
 import { RecipeSettingsResponse } from "@/types";
+
 import { Button } from "./ui/button";
 import { Card, CardFooter, CardHeader } from "./ui/card";
 import { Input } from "./ui/input";
-import { useToast } from "@/hooks/use-toast";
 
 type AcceptedFile = File & { preview: string };
 
@@ -19,7 +21,7 @@ type ImageUploadProps = {
 };
 
 export function ImageUpload({ setSettings }: ImageUploadProps) {
-  const [files, setFiles] = useState<AcceptedFile[]>([]);
+  const [file, setFile] = useState<AcceptedFile>();
   const { toast } = useToast();
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -27,29 +29,27 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
       "image/*": [],
     },
     maxFiles: 1,
-    onDrop: (acceptedFiles) => {
-      setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          })
-        )
+    onDrop: async (acceptedFiles) => {
+      const currentFile = acceptedFiles[0];
+      const resizedImage = await compressImage(currentFile, 512);
+      const imageFile = new File([resizedImage], currentFile.name, {
+        type: currentFile.type,
+      });
+
+      setFile(
+        Object.assign(imageFile, {
+          preview: URL.createObjectURL(imageFile),
+        })
       );
     },
   });
 
-  const thumbs = files.map((file) => (
-    <div key={file.name}>
-      <Image src={file.preview} alt={file.name} width={256} height={256} />
-    </div>
-  ));
-
   useEffect(() => {
     return () => {
-      files.forEach((file) => URL.revokeObjectURL(file.preview));
+      file && URL.revokeObjectURL(file.preview);
       setSettings(null);
     };
-  }, [files, setSettings]);
+  }, [file, setSettings]);
 
   return (
     <Card className="mx-4">
@@ -63,15 +63,24 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
         <p className="text-xl">
           Drag and drop image here, or click to select an image
         </p>
-        <aside className="flex flex-wrap gap-2">{thumbs}</aside>
+        <aside className="flex flex-wrap gap-2">
+          {file && (
+            <Image
+              src={file.preview}
+              alt={file.name}
+              width={256}
+              height={256}
+            />
+          )}
+        </aside>
       </CardHeader>
       <CardFooter>
-        {files.length > 0 && (
+        {file && (
           <Button
             className="m-auto"
             onClick={async () => {
               try {
-                const settings = await predictRecipe(files[0]);
+                const settings = await predictRecipe(file);
                 setSettings(settings);
               } catch (error) {
                 console.error(error);
