@@ -46,7 +46,11 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
 
   useEffect(() => {
     return () => {
-      file && URL.revokeObjectURL(file.preview);
+      if (!file) {
+        return;
+      }
+
+      URL.revokeObjectURL(file.preview);
       setSettings(null);
     };
   }, [file, setSettings]);
