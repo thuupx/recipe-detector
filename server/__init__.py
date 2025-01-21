@@ -1,9 +1,11 @@
 import os
 import uuid
-
+import logging
 from flask import Flask
 
 from server.detector import FujifilmRecipeDetector
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 detector = FujifilmRecipeDetector()
 
@@ -12,7 +14,7 @@ def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY="dev",
+        SECRET_KEY=os.environ.get("FLASK_SECRET_KEY", "dev"),
         DATABASE=os.path.join(app.instance_path, "flaskr.sqlite"),
     )
 
@@ -29,7 +31,15 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    @app.post("/predict")
+    @app.get("/")
+    def index():
+        return "Hello, World!"
+
+    @app.get("/health")
+    def health():
+        return "Healthy!"
+
+    @app.post("/api/predict")
     def predict():
         from flask import request
 
@@ -44,7 +54,7 @@ def create_app(test_config=None):
 
         os.remove(image_path)
 
-        print(result)
+        app.logger.info("Predicted successfully %s", result)
         return result
 
     return app

@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "server": "FLASK_DEBUG=1 pip3 install -r requirements.txt && python3 -m flask --app src/api/index run --debug -p 5328",
-    "dev": "concurrently \"next dev --turbopack\" \"npm run server\"",
+    "fe-dev": "next dev --turbopack",
+    "dev": "concurrently \"npm run fe-dev\" \"npm run server\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
