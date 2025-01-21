@@ -2,7 +2,7 @@
 import { ImageUpload } from "@/components/image-upload";
 import { RecipeSettings } from "@/components/recipe-settings";
 import { RecipeSettingsResponse } from "@/types";
-import { Heart } from "lucide-react";
+import { Github, Heart } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -19,7 +19,16 @@ export default function Home() {
         <RecipeSettings settings={settings} />
       </div>
       <footer className="container flex flex-col items-center justify-center gap-4 py-16">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground text-center">
+          <Link
+            className="flex items-center gap-1"
+            target="_blank"
+            href="https://github.com/thuupx/recipe-detector"
+          >
+            <span>
+              Send a star on <Github size={16} className="inline-block" />
+            </span>
+          </Link>
           Built with{" "}
           <span className="font-semibold">
             <Heart size={16} className="inline-block" />

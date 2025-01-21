@@ -84,6 +84,7 @@ export function ImageUpload({ setSettings }: ImageUploadProps) {
         {file && (
           <Button
             className="m-auto"
+            disabled={isLoading}
             onClick={async () => {
               try {
                 setIsLoading(true);
