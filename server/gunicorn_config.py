@@ -7,7 +7,7 @@ os.makedirs(log_dir, exist_ok=True)
 
 # Gunicorn configuration file
 bind = "0.0.0.0:8001"
-workers = multiprocessing.cpu_count() * 2 + 1
+workers = 1
 worker_class = "sync"
 worker_connections = 1000
 timeout = 30
