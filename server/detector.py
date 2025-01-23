@@ -7,8 +7,14 @@ from server.constants import numeric_fields, mappings, films_by_sensor
 
 
 SENSOR_FILM_SIMULATIONS = films_by_sensor
-MODEL_PATH = os.path.abspath("film_model.keras")
-SERVICE_ACCOUNT_PATH = os.path.abspath("service-account.json")
+
+# Get the directory where this script is located
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
+
+# Define paths relative to project root
+SERVICE_ACCOUNT_PATH = os.path.join(PROJECT_ROOT, "service-account.json")
+MODEL_PATH = os.path.join(SCRIPT_DIR, "film_model.keras")
 
 
 class FujifilmRecipeDetector:
@@ -23,21 +29,49 @@ class FujifilmRecipeDetector:
     def download_model_if_not_exist(self):
         """Download model from Firebase Storage if it does not exist."""
         if not os.path.exists(MODEL_PATH):
-            import firebase_admin
-            from firebase_admin import credentials, storage
+            try:
+                import firebase_admin
+                from firebase_admin import credentials, storage
+                import requests.exceptions
+                import logging
 
-            cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
-            firebase_admin.initialize_app(
-                cred, {"storageBucket": "vortex-ai-13f4.firebasestorage.app"}
-            )
+                logging.info(f"Checking service account file at: {SERVICE_ACCOUNT_PATH}")
+                if not os.path.exists(SERVICE_ACCOUNT_PATH):
+                    raise FileNotFoundError(f"Service account file not found at {SERVICE_ACCOUNT_PATH}")
 
-            bucket = storage.bucket()
-            blob = bucket.blob("vortex-models/film_model.keras")
+                logging.info("Loading credentials from service account file...")
+                cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+                
+                # Check if Firebase is already initialized
+                if not firebase_admin._apps:
+                    logging.info("Initializing Firebase app...")
+                    firebase_admin.initialize_app(
+                        cred, {"storageBucket": "vortex-ai-13f4.firebasestorage.app"}
+                    )
+                else:
+                    logging.info("Firebase app already initialized")
 
-            print("Downloading model...")
+                logging.info("Getting storage bucket...")
+                bucket = storage.bucket()
+                blob = bucket.blob("vortex-models/film_model.keras")
 
-            blob.download_to_filename(MODEL_PATH)
-            print("Downloaded")
+                logging.info("Starting model download...")
+                try:
+                    blob.download_to_filename(MODEL_PATH)
+                    logging.info("Model downloaded successfully")
+                except requests.exceptions.RequestException as e:
+                    logging.error(f"Network error during download: {str(e)}")
+                    raise
+                except Exception as e:
+                    logging.error(f"Error downloading model: {str(e)}")
+                    raise
+
+            except FileNotFoundError as e:
+                logging.error(str(e))
+                raise
+            except Exception as e:
+                logging.error(f"Unexpected error: {str(e)}")
+                raise
 
     def _denormalize_numeric(self, field, value):
         """Denormalize numeric values from model output."""
