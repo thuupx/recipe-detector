@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "server": "FLASK_DEBUG=1 pip3 install -r requirements.txt && python3 -m flask --app src/api/index run --debug -p 5328",
+    "server": "FLASK_DEBUG=1 pip3 install -r requirements.txt && python3 -m flask --app server run --debug -p 5328",
     "fe-dev": "next dev --turbopack",
     "dev": "concurrently \"npm run fe-dev\" \"npm run server\"",
     "build": "next build",
