@@ -28,6 +28,7 @@ server {
     server_name 54.254.34.219;
 
     access_log /var/log/nginx/recipe_detector_access.log combined;
+    error_log /var/log/nginx/recipe_detector_error.log;
 
     location / {
         proxy_pass http://127.0.0.1:8001;
