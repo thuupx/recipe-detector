@@ -1,9 +1,10 @@
-import * as _ from "lodash";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { RecipeSettingsResponse } from "@/types";
 import { categoricalFields, regressionFields } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store";
+import { RecipeSettingsResponse } from "@/types";
+import * as _ from "lodash";
 import { Camera, HelpCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 import {
   Tooltip,
@@ -11,10 +12,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-
-type RecipeSettingsProps = {
-  settings: RecipeSettingsResponse | null;
-};
 
 const formatProbability = (probability: number) => {
   return process.env.NEXT_PUBLIC_ENABLED_PERCENTAGE === "true"
@@ -65,7 +62,8 @@ const ConfidenceLegend = () => (
   </div>
 );
 
-export const RecipeSettings = ({ settings }: RecipeSettingsProps) => {
+export const RecipeSettings = () => {
+  const { settings } = useAppStore();
   const isLoading = settings === null;
 
   return (

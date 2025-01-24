@@ -1,7 +1,6 @@
 "use client";
 import { Github, Heart } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 import { ImageUpload } from "@/components/image-upload";
 import { RecipeSettings } from "@/components/recipe-settings";
@@ -14,11 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RecipeSettingsResponse, SensorModel } from "@/types";
+import { SensorModel } from "@/types";
+import { useAppStore } from "@/store";
 
 export default function Home() {
-  const [settings, setSettings] = useState<RecipeSettingsResponse | null>(null);
-  const [sensorModel, setSensorModel] = useState<SensorModel | undefined>();
+  const { sensorModel, setSensorModel } = useAppStore();
 
   const handleSensorModelChange = (value: string) => {
     setSensorModel(value as SensorModel);
@@ -72,8 +71,8 @@ export default function Home() {
               </SelectContent>
             </Select>
           </div>
-          <ImageUpload setSettings={setSettings} sensorModel={sensorModel} />
-          <RecipeSettings settings={settings} />
+          <ImageUpload />
+          <RecipeSettings />
         </div>
       </main>
 
