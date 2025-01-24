@@ -10,6 +10,7 @@ export const categoricalFields = [
 ];
 
 export const regressionFields = [
+  "iso",
   "highlight",
   "shadow",
   "color",
