@@ -1,3 +1,5 @@
+from enum import Enum
+
 categorical_fields = [
     "film_simulation",
     "sensor",
@@ -412,4 +414,26 @@ films_by_sensor = {
     "Bayer": ["Sepia", "Provia", "Monochrome", "Velvia", "Classic Chrome"],
     "GFX": ["Provia", "Classic Chrome", "Classic Negative"],
     "EXR-CMOS": ["Provia"],
+}
+
+
+class SensorModel(Enum):
+    XTransI = "X-Trans I"
+    XTransII = "X-Trans II"
+    XTransIII = "X-Trans III"
+    XTransIV = "X-Trans IV"
+    XTransV = "X-Trans V"
+    Bayer = "Bayer"
+    GFX = "GFX"
+    EXR = "EXR-CMOS"
+
+ignored_fields_by_sensor = {
+    SensorModel.XTransI: ["sensor"],
+    SensorModel.XTransII: ["sensor"],
+    SensorModel.XTransIII: ["sensor"],
+    SensorModel.XTransIV: ["sensor"],
+    SensorModel.XTransV: ["sensor"],
+    SensorModel.Bayer: ["sensor"],
+    SensorModel.GFX: ["sensor"],
+    SensorModel.EXR: ["sensor"],
 }

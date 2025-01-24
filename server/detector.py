@@ -4,7 +4,7 @@ import os
 
 from server.logger import logger
 from server.constants import numeric_fields, mappings, films_by_sensor
-
+from server.constants import SensorModel, ignored_fields_by_sensor
 
 SENSOR_FILM_SIMULATIONS = films_by_sensor
 
@@ -25,7 +25,6 @@ class FujifilmRecipeDetector:
 
         self.mappings = mappings
 
-
     def download_model_if_not_exist(self):
         """Download model from Firebase Storage if it does not exist."""
         if not os.path.exists(MODEL_PATH):
@@ -35,13 +34,17 @@ class FujifilmRecipeDetector:
                 import requests.exceptions
                 import logging
 
-                logging.info(f"Checking service account file at: {SERVICE_ACCOUNT_PATH}")
+                logging.info(
+                    f"Checking service account file at: {SERVICE_ACCOUNT_PATH}"
+                )
                 if not os.path.exists(SERVICE_ACCOUNT_PATH):
-                    raise FileNotFoundError(f"Service account file not found at {SERVICE_ACCOUNT_PATH}")
+                    raise FileNotFoundError(
+                        f"Service account file not found at {SERVICE_ACCOUNT_PATH}"
+                    )
 
                 logging.info("Loading credentials from service account file...")
                 cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
-                
+
                 # Check if Firebase is already initialized
                 if not firebase_admin._apps:
                     logging.info("Initializing Firebase app...")
@@ -123,7 +126,7 @@ class FujifilmRecipeDetector:
         except Exception as e:
             raise ValueError(f"Error processing image: {str(e)}")
 
-    def predict(self, image_path, top_k=5):
+    def predict(self, image_path, top_k=5, sensor_model: SensorModel = None):
         """Predict Fujifilm recipe from image."""
         # Preprocess image
         img = self.preprocess_image(image_path)
@@ -138,35 +141,41 @@ class FujifilmRecipeDetector:
 
         results = {}
 
-        # Get sensor prediction first to filter film simulations
-        sensor_preds = predictions.get("sensor", None)
-        if sensor_preds is not None:
-            temperature = 1
-            sensor_preds = sensor_preds[0]
-            sensor_preds = tf.nn.softmax(sensor_preds / temperature).numpy()
-            sensor_idx = np.argmax(sensor_preds)
-            reverse_sensor_mapping = {
-                v: k for k, v in self.mappings["sensor"]["indices"].items()
-            }
-            detected_sensor = reverse_sensor_mapping.get(sensor_idx)
-            supported_films = (
-                SENSOR_FILM_SIMULATIONS.get(detected_sensor, None)
-                if detected_sensor
-                else None
-            )
+        if sensor_model is not None:
+            detected_sensor = sensor_model.value
+        else:
+            # Get sensor prediction first to filter film simulations
+            sensor_predictions = predictions.get("sensor", None)
+            if sensor_predictions is not None:
+                temperature = 1
+                sensor_predictions = sensor_predictions[0]
+                sensor_predictions = tf.nn.softmax(
+                    sensor_predictions / temperature
+                ).numpy()
+                sensor_idx = np.argmax(sensor_predictions)
+                reverse_sensor_mapping = {
+                    v: k for k, v in self.mappings["sensor"]["indices"].items()
+                }
+                detected_sensor = reverse_sensor_mapping.get(sensor_idx)
+
+        supported_films = (
+            SENSOR_FILM_SIMULATIONS.get(detected_sensor, None)
+            if detected_sensor
+            else None
+        )
 
         # Process categorical fields (including film_simulation)
-        for field, field_preds in predictions.items():
+        for field, field_predictions in predictions.items():
             if field in numeric_fields:
                 continue
 
-            field_preds = field_preds[0]  # Get first batch item
+            field_predictions = field_predictions[0]  # Get first batch item
 
             # Apply softmax with temperature scaling to reduce overconfidence
-            if len(field_preds.shape) > 0:
+            if len(field_predictions.shape) > 0:
                 temperature = 1
-                field_preds = field_preds / temperature  # Scale logits
-                field_preds = tf.nn.softmax(field_preds).numpy()
+                field_predictions = field_predictions / temperature  # Scale logits
+                field_predictions = tf.nn.softmax(field_predictions).numpy()
 
             # Filter film simulations based on sensor compatibility
             if field == "film_simulation" and supported_films:
@@ -174,17 +183,17 @@ class FujifilmRecipeDetector:
                     v: k for k, v in self.mappings[field]["indices"].items()
                 }
                 # Zero out probabilities for unsupported film simulations
-                for idx in range(len(field_preds)):
+                for idx in range(len(field_predictions)):
                     if idx in reverse_mapping:
                         film_sim = reverse_mapping[idx]
                         if film_sim not in supported_films:
-                            field_preds[idx] = 0
+                            field_predictions[idx] = 0
                 # Renormalize probabilities
-                if field_preds.sum() > 0:
-                    field_preds = field_preds / field_preds.sum()
+                if field_predictions.sum() > 0:
+                    field_predictions = field_predictions / field_predictions.sum()
 
             # Get top k predictions
-            top_indices = np.argsort(field_preds)[-top_k:][::-1]
+            top_indices = np.argsort(field_predictions)[-top_k:][::-1]
 
             # Create list of predictions
             field_results = []
@@ -194,7 +203,7 @@ class FujifilmRecipeDetector:
                 if idx in reverse_mapping:
                     value = reverse_mapping[idx]
                     if value:
-                        prob = float(field_preds[idx])
+                        prob = float(field_predictions[idx])
                         if prob > 0.001:
                             field_results.append({"value": value, "probability": prob})
 

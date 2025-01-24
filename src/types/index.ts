@@ -111,3 +111,14 @@ export interface WhiteBalance {
   probability: number;
   value: string;
 }
+
+export enum SensorModel {
+  XTransI = "X-Trans I",
+  XTransII = "X-Trans II",
+  XTransIII = "X-Trans III",
+  XTransIV = "X-Trans IV",
+  XTransV = "X-Trans V",
+  Bayer = "Bayer",
+  GFX = "GFX",
+  EXR = "EXR-CMOS",
+}

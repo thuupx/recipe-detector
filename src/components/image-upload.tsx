@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { RecipeSettingsResponse } from "@/types";
+import { RecipeSettingsResponse, SensorModel } from "@/types";
 import { Loader2, Upload } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useState } from "react";
@@ -10,18 +10,23 @@ import { Input } from "./ui/input";
 import { compressImage } from "@/lib/image";
 import { predictRecipe } from "@/app/actions";
 
+
 type ImageUploadProps = {
   setSettings: (settings: RecipeSettingsResponse) => void;
+  sensorModel?: SensorModel;
 };
 
-export const ImageUpload = ({ setSettings }: ImageUploadProps) => {
+export const ImageUpload = ({
+  setSettings,
+  sensorModel,
+}: ImageUploadProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
-      if (file) {
+      if (file && sensorModel) {
         const resizedImage = await compressImage(file, 512);
         const imageFile = new File([resizedImage], file.name, {
           type: file.type,
@@ -30,7 +35,7 @@ export const ImageUpload = ({ setSettings }: ImageUploadProps) => {
         setLoading(true);
 
         try {
-          const data = await predictRecipe(imageFile);
+          const data = await predictRecipe(imageFile, sensorModel);
           setSettings(data);
         } catch (error) {
           console.error("Error:", error);
@@ -39,16 +44,17 @@ export const ImageUpload = ({ setSettings }: ImageUploadProps) => {
         }
       }
     },
-    [setSettings]
+    [setSettings, sensorModel]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      "image/*": [".jpeg", ".jpg", ".png", ".webp"],
+      "image/*": [".jpeg", ".jpg", ".png", ".webp", ".raf"],
     },
     maxFiles: 1,
     multiple: false,
+    disabled: !sensorModel,
   });
 
   return (
@@ -63,10 +69,12 @@ export const ImageUpload = ({ setSettings }: ImageUploadProps) => {
         <div
           {...getRootProps()}
           className={cn(
-            "border-2 border-dashed rounded-lg p-8 transition-colors cursor-pointer",
-            "hover:border-primary/50 hover:bg-muted/50",
+            "border-2 border-dashed rounded-lg p-8 transition-colors",
+            sensorModel &&
+              "cursor-pointer hover:border-primary/50 hover:bg-muted/50",
             isDragActive && "border-primary bg-muted/50",
-            loading && "opacity-50 cursor-not-allowed"
+            loading && "opacity-50 cursor-not-allowed",
+            !sensorModel && "cursor-not-allowed opacity-50"
           )}
         >
           <div className="flex flex-col items-center justify-center gap-4">
@@ -92,10 +100,12 @@ export const ImageUpload = ({ setSettings }: ImageUploadProps) => {
               <p className="text-sm font-medium">
                 {isDragActive
                   ? "Drop the image here"
-                  : "Drag and drop image here, or click to select"}
+                  : sensorModel
+                  ? "Drag and drop image here, or click to select"
+                  : "Please select a sensor model first"}
               </p>
               <p className="text-xs text-muted-foreground">
-                Supports JPG, PNG and WebP
+                Supports JPG, PNG, WebP and RAF files
               </p>
             </div>
           </div>
