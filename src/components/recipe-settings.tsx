@@ -73,48 +73,49 @@ const ConfidenceLegend = () => (
 const getValueWithExifData = (
   field: string,
   originalValue: string,
-  exifData: FujifilmExifData | null,
-  settings: RecipeSettingsResponse | null
-): { value: string; updatedSettings: RecipeSettingsResponse | null } => {
-  if (_.isEmpty(exifData)) return { value: originalValue, updatedSettings: settings };
+  exifData: FujifilmExifData | null
+): {
+  value: string;
+  updatedSetting: { probability: number; value: string } | null;
+} => {
+  if (_.isEmpty(exifData))
+    return { value: originalValue, updatedSetting: null };
 
-  const updatedSettings = settings ? { ...settings } : null;
-
-  if (field === "camera_model" && updatedSettings) {
-    updatedSettings.camera_model = [
-      {
+  if (field === "camera_model") {
+    return {
+      value: exifData.Model,
+      updatedSetting: {
         probability: 1,
         value: exifData.Model,
       },
-    ];
-    return { value: exifData.Model, updatedSettings };
+    };
   }
 
-  if (field === "white_balance" && updatedSettings) {
+  if (field === "white_balance") {
     const whiteBalance =
       exifData.LightSource !== "Unknown" ? exifData.LightSource : originalValue;
 
-    updatedSettings.white_balance = [
-      {
+    return {
+      value: whiteBalance,
+      updatedSetting: {
         probability: 1,
         value: whiteBalance,
       },
-    ];
-    return { value: whiteBalance, updatedSettings };
+    };
   }
 
-  if (field === "iso" && updatedSettings) {
+  if (field === "iso") {
     const isoValue = exifData.ISOSpeedRatings.toString();
-    updatedSettings.iso = [
-      {
+    return {
+      value: isoValue,
+      updatedSetting: {
         probability: 1,
         value: isoValue,
       },
-    ];
-    return { value: isoValue, updatedSettings };
+    };
   }
 
-  return { value: originalValue, updatedSettings };
+  return { value: originalValue, updatedSetting: null };
 };
 
 const getConfidenceLevel = (probability: number | undefined) => {
@@ -125,7 +126,7 @@ const getConfidenceLevel = (probability: number | undefined) => {
 };
 
 export const RecipeSettings = () => {
-  const { settings, exifData, setSettings } = useAppStore();
+  const { settings, exifData } = useAppStore();
   const isLoading = settings === null;
 
   return (
@@ -144,20 +145,16 @@ export const RecipeSettings = () => {
             <>
               <div className="divide-y">
                 {categoricalFields.map((field) => {
-                  const setting =
+                  let setting =
                     settings?.[field as keyof RecipeSettingsResponse]?.[0];
 
-                  const { value: updatedValue, updatedSettings } = getValueWithExifData(
-                    field,
-                    setting?.value,
-                    exifData,
-                    settings
-                  );
+                  const { value: updatedValue, updatedSetting } =
+                    getValueWithExifData(field, setting?.value, exifData);
 
                   if (!updatedValue) return null;
 
-                  if (updatedSettings && !_.isEqual(settings, updatedSettings)) {
-                    setSettings(updatedSettings);
+                  if (updatedSetting) {
+                    setting = updatedSetting;
                   }
 
                   const probability = setting?.probability;
