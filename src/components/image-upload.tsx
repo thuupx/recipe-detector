@@ -17,14 +17,15 @@ export const ImageUpload = () => {
   const [loading, setLoading] = useState(false);
   const [cameraModel, setCameraModel] = useState<string | null>(null);
   const [isFujifilm, setIsFujifilm] = useState<boolean>(true);
-  
+
   const { setExifData, setSettings, sensorModel } = useAppStore();
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       const imageFile = acceptedFiles[0];
       if (imageFile) {
-        EXIF.getData(imageFile, function (this: File) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        EXIF.getData(imageFile as any, function (this: File) {
           const exifData = EXIF.getAllTags(this);
           if (exifData) {
             setExifData(exifData);
