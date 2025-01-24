@@ -1,9 +1,10 @@
-import * as _ from "lodash";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { RecipeSettingsResponse } from "@/types";
 import { categoricalFields, regressionFields } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store";
+import { FujifilmExifData, RecipeSettingsResponse } from "@/types";
+import * as _ from "lodash";
 import { Camera, HelpCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 import {
   Tooltip,
@@ -11,10 +12,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-
-type RecipeSettingsProps = {
-  settings: RecipeSettingsResponse | null;
-};
 
 const formatProbability = (probability: number) => {
   return process.env.NEXT_PUBLIC_ENABLED_PERCENTAGE === "true"
@@ -36,7 +33,9 @@ const LoadingSkeleton = () => (
 const ConfidenceLegend = () => (
   <div className="mt-6 pt-6 border-t">
     <div className="flex items-center justify-between mb-2">
-      <span className="text-sm font-medium text-muted-foreground">Confidence Level</span>
+      <span className="text-sm font-medium text-muted-foreground">
+        Confidence Level
+      </span>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger>
@@ -51,21 +50,82 @@ const ConfidenceLegend = () => (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">High</span>
-        <span className="text-green-600 dark:text-green-400 font-medium">≥ 80%</span>
+        <span className="text-green-600 dark:text-green-400 font-medium">
+          ≥ 80%
+        </span>
       </div>
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">Medium</span>
-        <span className="text-yellow-600 dark:text-yellow-400 font-medium">50-79%</span>
+        <span className="text-yellow-600 dark:text-yellow-400 font-medium">
+          50-79%
+        </span>
       </div>
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">Low</span>
-        <span className="text-red-600 dark:text-red-400 font-medium">&lt; 50%</span>
+        <span className="text-red-600 dark:text-red-400 font-medium">
+          &lt; 50%
+        </span>
       </div>
     </div>
   </div>
 );
 
-export const RecipeSettings = ({ settings }: RecipeSettingsProps) => {
+const getValueWithExifData = (
+  field: string,
+  originalValue: string,
+  exifData: FujifilmExifData | null,
+  settings: RecipeSettingsResponse | null
+) => {
+  if (_.isEmpty(exifData)) return originalValue;
+
+  if (field === "camera_model" && settings) {
+    settings.camera_model = [
+      {
+        probability: 1,
+        value: exifData.Model,
+      },
+    ];
+    return exifData.Model;
+  }
+
+  if (field === "white_balance" && settings) {
+    const whiteBalance =
+      exifData.LightSource !== "Unknown" ? exifData.LightSource : originalValue;
+
+    settings.white_balance = [
+      {
+        probability: 1,
+        value: whiteBalance,
+      },
+    ];
+    return whiteBalance;
+  }
+
+  return originalValue;
+};
+
+const getConfidenceLevel = (probability: number | undefined) => {
+  if (!probability) return null;
+  if (probability >= 0.8) return "high";
+  if (probability >= 0.5) return "medium";
+  return "low";
+};
+
+const getConfidenceColor = (level: string | null) => {
+  switch (level) {
+    case "high":
+      return "text-green-600 dark:text-green-400";
+    case "medium":
+      return "text-yellow-600 dark:text-yellow-400";
+    case "low":
+      return "text-red-600 dark:text-red-400";
+    default:
+      return "";
+  }
+};
+
+export const RecipeSettings = () => {
+  const { settings, exifData } = useAppStore();
   const isLoading = settings === null;
 
   return (
@@ -84,15 +144,21 @@ export const RecipeSettings = ({ settings }: RecipeSettingsProps) => {
             <>
               <div className="divide-y">
                 {categoricalFields.map((field) => {
-                  const setting = settings?.[field as keyof RecipeSettingsResponse][0];
+                  const setting =
+                    settings?.[field as keyof RecipeSettingsResponse]?.[0];
+
+                  const updatedValue = getValueWithExifData(
+                    field,
+                    setting?.value,
+                    exifData,
+                    settings
+                  );
+
+                  if (!updatedValue) return null;
+
                   const probability = setting?.probability;
-                  const confidenceLevel = probability
-                    ? probability >= 0.8
-                      ? "high"
-                      : probability >= 0.5
-                      ? "medium"
-                      : "low"
-                    : null;
+                  const confidenceLevel = getConfidenceLevel(probability);
+                  const confidenceColor = getConfidenceColor(confidenceLevel);
 
                   return (
                     <div
@@ -106,15 +172,10 @@ export const RecipeSettings = ({ settings }: RecipeSettingsProps) => {
                         <span
                           className={cn(
                             "text-sm font-semibold",
-                            confidenceLevel === "high" &&
-                              "text-green-600 dark:text-green-400",
-                            confidenceLevel === "medium" &&
-                              "text-yellow-600 dark:text-yellow-400",
-                            confidenceLevel === "low" &&
-                              "text-red-600 dark:text-red-400"
+                            confidenceColor
                           )}
                         >
-                          {setting?.value}
+                          {updatedValue}
                         </span>
                         {probability && (
                           <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">

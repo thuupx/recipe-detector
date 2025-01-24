@@ -1,4 +1,5 @@
 export interface RecipeSettingsResponse {
+  camera_model: CameraModel[];
   clarity: Clarity[];
   color: Color[];
   color_chrome_effect: ColorChromeEffect[];
@@ -16,6 +17,11 @@ export interface RecipeSettingsResponse {
   wb_shift_blue: WbShiftBlue[];
   wb_shift_red: WbShiftRed[];
   white_balance: WhiteBalance[];
+}
+
+export interface CameraModel {
+  probability: number;
+  value: string;
 }
 
 export interface Clarity {
@@ -110,4 +116,84 @@ export interface WbShiftRed {
 export interface WhiteBalance {
   probability: number;
   value: string;
+}
+
+export enum SensorModel {
+  XTransI = "X-Trans I",
+  XTransII = "X-Trans II",
+  XTransIII = "X-Trans III",
+  XTransIV = "X-Trans IV",
+  XTransV = "X-Trans V",
+  Bayer = "Bayer",
+  GFX = "GFX",
+  EXR = "EXR-CMOS",
+  Unknown = "Unknown",
+}
+
+export interface FujifilmExifData {
+  Make: string;
+  Model: string;
+  Orientation: number;
+  XResolution: number;
+  YResolution: number;
+  ResolutionUnit: number;
+  Software: string;
+  DateTime: string;
+  Artist: string;
+  YCbCrPositioning: number;
+  Copyright: string;
+  ExifIFDPointer: number;
+  undefined: string;
+  ExposureTime: number;
+  FNumber: number;
+  ExposureProgram: string;
+  ISOSpeedRatings: number;
+  ExifVersion: string;
+  DateTimeOriginal: string;
+  DateTimeDigitized: string;
+  ComponentsConfiguration: string;
+  CompressedBitsPerPixel: number;
+  ShutterSpeedValue: number;
+  ApertureValue: number;
+  BrightnessValue: number;
+  ExposureBias: number;
+  MaxApertureValue: number;
+  MeteringMode: string;
+  LightSource: string;
+  Flash: string;
+  FocalLength: number;
+  MakerNote: number[];
+  UserComment: number[];
+  FlashpixVersion: string;
+  ColorSpace: number;
+  PixelXDimension: number;
+  PixelYDimension: number;
+  InteroperabilityIFDPointer: number;
+  FocalPlaneXResolution: number;
+  FocalPlaneYResolution: number;
+  FocalPlaneResolutionUnit: number;
+  SensingMethod: string;
+  FileSource: string;
+  SceneType: string;
+  CustomRendered: string;
+  ExposureMode: number;
+  WhiteBalance: string;
+  FocalLengthIn35mmFilm: number;
+  SceneCaptureType: string;
+  Sharpness: string;
+  SubjectDistanceRange: string;
+  thumbnail: Thumbnail;
+}
+
+export interface Thumbnail {
+  Compression: number;
+  Orientation: number;
+  XResolution: number;
+  YResolution: number;
+  ResolutionUnit: number;
+  undefined: string;
+  JpegIFOffset: number;
+  JpegIFByteCount: number;
+  YCbCrPositioning: number;
+  blob: Blob;
 }

@@ -1,4 +1,9 @@
-# Backend for reverse engineering a Fujifilm custom recipe using AI
+# Fujifilm custom recipe detector - powered by AI
+
+## Features
+
+- Reverse engineer a Fujifilm custom recipe using AI
+- No need to know the camera model or make assumptions about the recipe
 
 ## Example response
 

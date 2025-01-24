@@ -1,4 +1,5 @@
 export const categoricalFields = [
+  "camera_model",
   "film_simulation",
   "sensor",
   "dynamic_range",
@@ -9,6 +10,7 @@ export const categoricalFields = [
 ];
 
 export const regressionFields = [
+  "iso",
   "highlight",
   "shadow",
   "color",

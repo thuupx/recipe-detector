@@ -4,6 +4,7 @@ import logging
 from flask import Flask
 
 from server.detector import FujifilmRecipeDetector
+from server.constants import SensorModel
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
 
@@ -44,17 +45,17 @@ def create_app(test_config=None):
         from flask import request
 
         image = request.files["image"].read()
+        sensor_model = request.form["sensor_model"]
 
         image_path = uuid.uuid4().hex + ".jpg"
 
         with open(image_path, "wb") as f:
             f.write(image)
 
-        result = detector.predict(image_path)
+        result = detector.predict(image_path, sensor_model=SensorModel(sensor_model))
 
         os.remove(image_path)
 
-        app.logger.info("Predicted successfully %s", result)
         return result
 
     return app
