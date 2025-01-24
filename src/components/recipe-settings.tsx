@@ -75,43 +75,46 @@ const getValueWithExifData = (
   originalValue: string,
   exifData: FujifilmExifData | null,
   settings: RecipeSettingsResponse | null
-) => {
-  if (_.isEmpty(exifData)) return originalValue;
+): { value: string; updatedSettings: RecipeSettingsResponse | null } => {
+  if (_.isEmpty(exifData)) return { value: originalValue, updatedSettings: settings };
 
-  if (field === "camera_model" && settings) {
-    settings.camera_model = [
+  const updatedSettings = settings ? { ...settings } : null;
+
+  if (field === "camera_model" && updatedSettings) {
+    updatedSettings.camera_model = [
       {
         probability: 1,
         value: exifData.Model,
       },
     ];
-    return exifData.Model;
+    return { value: exifData.Model, updatedSettings };
   }
 
-  if (field === "white_balance" && settings) {
+  if (field === "white_balance" && updatedSettings) {
     const whiteBalance =
       exifData.LightSource !== "Unknown" ? exifData.LightSource : originalValue;
 
-    settings.white_balance = [
+    updatedSettings.white_balance = [
       {
         probability: 1,
         value: whiteBalance,
       },
     ];
-    return whiteBalance;
+    return { value: whiteBalance, updatedSettings };
   }
 
-  if (field === "iso" && settings) {
-    settings.iso = [
+  if (field === "iso" && updatedSettings) {
+    const isoValue = exifData.ISOSpeedRatings.toString();
+    updatedSettings.iso = [
       {
         probability: 1,
-        value: exifData.ISOSpeedRatings.toString(),
+        value: isoValue,
       },
     ];
-    return exifData.ISOSpeedRatings.toString();
+    return { value: isoValue, updatedSettings };
   }
 
-  return originalValue;
+  return { value: originalValue, updatedSettings };
 };
 
 const getConfidenceLevel = (probability: number | undefined) => {
@@ -122,7 +125,7 @@ const getConfidenceLevel = (probability: number | undefined) => {
 };
 
 export const RecipeSettings = () => {
-  const { settings, exifData } = useAppStore();
+  const { settings, exifData, setSettings } = useAppStore();
   const isLoading = settings === null;
 
   return (
@@ -144,7 +147,7 @@ export const RecipeSettings = () => {
                   const setting =
                     settings?.[field as keyof RecipeSettingsResponse]?.[0];
 
-                  const updatedValue = getValueWithExifData(
+                  const { value: updatedValue, updatedSettings } = getValueWithExifData(
                     field,
                     setting?.value,
                     exifData,
@@ -152,6 +155,10 @@ export const RecipeSettings = () => {
                   );
 
                   if (!updatedValue) return null;
+
+                  if (updatedSettings && !_.isEqual(settings, updatedSettings)) {
+                    setSettings(updatedSettings);
+                  }
 
                   const probability = setting?.probability;
                   const confidenceLevel = getConfidenceLevel(probability);
