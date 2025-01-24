@@ -1,4 +1,5 @@
 export interface RecipeSettingsResponse {
+  camera_model: CameraModel[];
   clarity: Clarity[];
   color: Color[];
   color_chrome_effect: ColorChromeEffect[];
@@ -16,6 +17,11 @@ export interface RecipeSettingsResponse {
   wb_shift_blue: WbShiftBlue[];
   wb_shift_red: WbShiftRed[];
   white_balance: WhiteBalance[];
+}
+
+export interface CameraModel {
+  probability: number;
+  value: string;
 }
 
 export interface Clarity {

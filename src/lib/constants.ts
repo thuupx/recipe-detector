@@ -1,4 +1,5 @@
 export const categoricalFields = [
+  "camera_model",
   "film_simulation",
   "sensor",
   "dynamic_range",
