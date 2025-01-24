@@ -7,10 +7,10 @@ export const categoricalFields = [
   "color_chrome_effect",
   "color_chrome_effect_blue",
   "white_balance",
+  "iso",
 ];
 
 export const regressionFields = [
-  "iso",
   "highlight",
   "shadow",
   "color",

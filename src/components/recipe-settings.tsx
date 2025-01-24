@@ -101,6 +101,16 @@ const getValueWithExifData = (
     return whiteBalance;
   }
 
+  if (field === "iso" && settings) {
+    settings.iso = [
+      {
+        probability: 1,
+        value: exifData.ISOSpeedRatings.toString(),
+      },
+    ];
+    return exifData.ISOSpeedRatings.toString();
+  }
+
   return originalValue;
 };
 
@@ -109,19 +119,6 @@ const getConfidenceLevel = (probability: number | undefined) => {
   if (probability >= 0.8) return "high";
   if (probability >= 0.5) return "medium";
   return "low";
-};
-
-const getConfidenceColor = (level: string | null) => {
-  switch (level) {
-    case "high":
-      return "text-green-600 dark:text-green-400";
-    case "medium":
-      return "text-yellow-600 dark:text-yellow-400";
-    case "low":
-      return "text-red-600 dark:text-red-400";
-    default:
-      return "";
-  }
 };
 
 export const RecipeSettings = () => {
@@ -158,7 +155,6 @@ export const RecipeSettings = () => {
 
                   const probability = setting?.probability;
                   const confidenceLevel = getConfidenceLevel(probability);
-                  const confidenceColor = getConfidenceColor(confidenceLevel);
 
                   return (
                     <div
@@ -170,10 +166,14 @@ export const RecipeSettings = () => {
                       </span>
                       <div className="flex items-center gap-2">
                         <span
-                          className={cn(
-                            "text-sm font-semibold",
-                            confidenceColor
-                          )}
+                          className={cn("text-sm font-semibold", {
+                            "text-green-600 dark:text-green-400":
+                              confidenceLevel === "high",
+                            "text-yellow-600 dark:text-yellow-400":
+                              confidenceLevel === "medium",
+                            "text-red-600 dark:text-red-400":
+                              confidenceLevel === "low",
+                          })}
                         >
                           {updatedValue}
                         </span>
