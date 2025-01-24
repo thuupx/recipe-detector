@@ -85,6 +85,7 @@ export const RecipeSettings = ({ settings }: RecipeSettingsProps) => {
               <div className="divide-y">
                 {categoricalFields.map((field) => {
                   const setting = settings?.[field as keyof RecipeSettingsResponse][0];
+                  const value = setting?.value;
                   const probability = setting?.probability;
                   const confidenceLevel = probability
                     ? probability >= 0.8
@@ -94,7 +95,7 @@ export const RecipeSettings = ({ settings }: RecipeSettingsProps) => {
                       : "low"
                     : null;
 
-                  return (
+                  return value && (
                     <div
                       key={field}
                       className="flex items-center justify-between py-3 group hover:bg-muted/50 rounded-sm transition-colors"
@@ -114,7 +115,7 @@ export const RecipeSettings = ({ settings }: RecipeSettingsProps) => {
                               "text-red-600 dark:text-red-400"
                           )}
                         >
-                          {setting?.value}
+                          {value}
                         </span>
                         {probability && (
                           <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">

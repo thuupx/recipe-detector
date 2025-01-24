@@ -126,7 +126,7 @@ class FujifilmRecipeDetector:
         except Exception as e:
             raise ValueError(f"Error processing image: {str(e)}")
 
-    def predict(self, image_path, top_k=5, sensor_model: SensorModel = None):
+    def predict(self, image_path, sensor_model: SensorModel, top_k=5):
         """Predict Fujifilm recipe from image."""
         # Preprocess image
         img = self.preprocess_image(image_path)
@@ -198,11 +198,12 @@ class FujifilmRecipeDetector:
             # Create list of predictions
             field_results = []
             reverse_mapping = {v: k for k, v in self.mappings[field]["indices"].items()}
+            ignored_fields = ignored_fields_by_sensor.get(sensor_model, [])
 
             for idx in top_indices:
                 if idx in reverse_mapping:
                     value = reverse_mapping[idx]
-                    if value:
+                    if value and field not in ignored_fields:
                         prob = float(field_predictions[idx])
                         if prob > 0.001:
                             field_results.append({"value": value, "probability": prob})

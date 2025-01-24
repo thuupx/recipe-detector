@@ -427,8 +427,14 @@ class SensorModel(Enum):
     GFX = "GFX"
     EXR = "EXR-CMOS"
 
+
 ignored_fields_by_sensor = {
-    SensorModel.XTransI: ["sensor"],
+    SensorModel.XTransI: [
+        "sensor",
+        "color_chrome_effect",
+        "color_chrome_effect_blue",
+        "clarity",
+    ],
     SensorModel.XTransII: ["sensor"],
     SensorModel.XTransIII: ["sensor"],
     SensorModel.XTransIV: ["sensor"],
