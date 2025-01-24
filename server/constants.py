@@ -426,6 +426,7 @@ class SensorModel(Enum):
     Bayer = "Bayer"
     GFX = "GFX"
     EXR = "EXR-CMOS"
+    Unknown = "Unknown"
 
 
 ignored_fields_by_sensor = {

@@ -121,4 +121,5 @@ export enum SensorModel {
   Bayer = "Bayer",
   GFX = "GFX",
   EXR = "EXR-CMOS",
+  Unknown = "Unknown",
 }

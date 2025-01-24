@@ -126,7 +126,7 @@ class FujifilmRecipeDetector:
         except Exception as e:
             raise ValueError(f"Error processing image: {str(e)}")
 
-    def predict(self, image_path, sensor_model: SensorModel, top_k=5):
+    def predict(self, image_path, sensor_model: SensorModel = None, top_k=5):
         """Predict Fujifilm recipe from image."""
         # Preprocess image
         img = self.preprocess_image(image_path)
@@ -141,7 +141,7 @@ class FujifilmRecipeDetector:
 
         results = {}
 
-        if sensor_model is not None:
+        if sensor_model is not None and sensor_model.value != "Unknown":
             detected_sensor = sensor_model.value
         else:
             # Get sensor prediction first to filter film simulations

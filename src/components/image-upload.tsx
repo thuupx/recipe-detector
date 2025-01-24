@@ -26,7 +26,7 @@ export const ImageUpload = ({
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
-      if (file && sensorModel) {
+      if (file) {
         const resizedImage = await compressImage(file, 512);
         const imageFile = new File([resizedImage], file.name, {
           type: file.type,
