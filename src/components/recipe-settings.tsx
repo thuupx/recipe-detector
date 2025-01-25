@@ -81,7 +81,7 @@ const getValueWithExifData = (
   if (_.isEmpty(exifData))
     return { value: originalValue, updatedSetting: null };
 
-  if (field === "camera_model") {
+  if (field === "camera_model" && exifData.Model) {
     return {
       value: exifData.Model,
       updatedSetting: {
@@ -91,7 +91,7 @@ const getValueWithExifData = (
     };
   }
 
-  if (field === "white_balance") {
+  if (field === "white_balance" && exifData.LightSource) {
     const whiteBalance =
       exifData.LightSource !== "Unknown" ? exifData.LightSource : originalValue;
 
@@ -104,7 +104,7 @@ const getValueWithExifData = (
     };
   }
 
-  if (field === "iso") {
+  if (field === "iso" && exifData.ISOSpeedRatings) {
     const isoValue = exifData.ISOSpeedRatings.toString();
     return {
       value: isoValue,
